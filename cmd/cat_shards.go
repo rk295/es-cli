@@ -31,7 +31,7 @@ const (
 func init() {
 	shardsCmd.Flags().StringVarP(&sortField, sortFlag, "s", defaultSortField, "Field to sort by, possible to list multiple comma separated See https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-shards.html for full list of fields")
 	shardsCmd.Flags().StringVarP(&byteFormat, byteFlag, "b", defaultByteFormat, `Byte unit to use. Valid values are: "b", "k", "kb", "m", "mb", "g", "gb", "t", "tb", "p" or "pb"`)
-	rootCmd.AddCommand(shardsCmd)
+	catCmd.AddCommand(shardsCmd)
 }
 
 func esShards(cmd *cobra.Command, args []string) {

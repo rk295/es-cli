@@ -25,7 +25,7 @@ var (
 func init() {
 	allocationCmd.Flags().StringVarP(&allocSortField, sortFlag, "s", "node", "Field to sort by, possible to list multiple comma separated See https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-allocation.html for full list of fields")
 	allocationCmd.Flags().StringVarP(&byteFormat, byteFlag, "b", defaultByteFormat, `Byte unit to use. Valid values are: "b", "k", "kb", "m", "mb", "g", "gb", "t", "tb", "p" or "pb"`)
-	rootCmd.AddCommand(allocationCmd)
+	catCmd.AddCommand(allocationCmd)
 }
 
 func esAllocation(cmd *cobra.Command, args []string) {
@@ -51,11 +51,11 @@ func esAllocation(cmd *cobra.Command, args []string) {
 
 	t.AppendHeader(table.Row{
 		"Shards",
-		"DiskIndices",
-		"DiskUsed",
-		"DiskAvail",
-		"DiskTotal",
-		"DiskPercent",
+		"Number of Indices",
+		fmt.Sprintf("Disk Used (%s)", byteFormat),
+		fmt.Sprintf("Disk Avail (%s)", byteFormat),
+		fmt.Sprintf("Disk Total (%s)", byteFormat),
+		"Disk Percent",
 		"Host",
 		"IP",
 		"Node",
