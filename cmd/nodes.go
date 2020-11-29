@@ -1,0 +1,87 @@
+package cmd
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/hokaccha/go-prettyjson"
+	"github.com/jedib0t/go-pretty/table"
+	elastic "github.com/olivere/elastic/v7"
+	"github.com/spf13/cobra"
+)
+
+var (
+	nodesCmd = &cobra.Command{
+		Use:   "nodes",
+		Short: "es nodes",
+		Long:  "es cluster nodes",
+		Run:   esNodes,
+	}
+)
+
+func init() {
+	rootCmd.AddCommand(nodesCmd)
+}
+
+func esNodes(cmd *cobra.Command, args []string) {
+	ctx := context.Background()
+
+	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer client.Stop()
+
+	nodes := client.NodesInfo()
+
+	status, err := nodes.Do(ctx)
+
+	t := table.NewWriter()
+	t.Render()
+	t.SetStyle(tableStyle)
+
+	t.AppendHeader(table.Row{
+		"Name",
+		"Version",
+		"Attributes",
+		"Node",
+	})
+
+	t.SetCaption("%s_nodes", esURL)
+
+	for _, v := range status.Nodes {
+
+		var attributes string
+
+		if v.Attributes == nil {
+			attributes = ""
+		} else {
+			a, err := prettyjson.Marshal(v.Attributes)
+			if err != nil {
+				fmt.Println(err)
+			}
+			attributes = string(a)
+		}
+
+		var settings string
+		if v.Settings == nil {
+			settings = ""
+		} else {
+			s, err := prettyjson.Marshal(v.Settings)
+			if err != nil {
+				fmt.Println(err)
+			}
+			settings = string(s)
+		}
+
+		t.AppendRow([]interface{}{
+			v.Name,
+			v.Version,
+			attributes,
+			settings,
+		})
+	}
+	fmt.Println(t.Render())
+	return
+
+}
