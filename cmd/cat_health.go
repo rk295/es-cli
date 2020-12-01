@@ -12,8 +12,7 @@ import (
 
 var healthCmd = &cobra.Command{
 	Use:           "health",
-	Short:         "health",
-	Long:          "health",
+	Short:         "Prints the current cluster health.",
 	RunE:          catHealth,
 	SilenceErrors: true,
 	SilenceUsage:  true,

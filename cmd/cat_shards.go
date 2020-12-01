@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-	"github.com/jedib0t/go-pretty/table"
+	"github.com/jedib0t/go-pretty/v6/table"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/spf13/cobra"
 )
@@ -13,8 +13,8 @@ import (
 var (
 	shardsCmd = &cobra.Command{
 		Use:           "shards",
-		Short:         "cat shards",
-		Long:          "cat shards",
+		Short:         "Lists the shards in the cluster.",
+		Long:          "Lists the shards in the cluster. Supports sorting and changing the byte unit to use.",
 		RunE:          esShards,
 		SilenceErrors: true,
 		SilenceUsage:  true,

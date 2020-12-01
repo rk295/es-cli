@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/hokaccha/go-prettyjson"
-	"github.com/jedib0t/go-pretty/table"
+	"github.com/jedib0t/go-pretty/v6/table"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/spf13/cobra"
 )
