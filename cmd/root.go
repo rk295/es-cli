@@ -5,9 +5,10 @@ import (
 )
 
 var (
-	cfgFile     string
-	userLicense string
-	rootCmd     = &cobra.Command{}
+	rootCmd = &cobra.Command{
+		Use:   "es-cli",
+		Short: "A simple Elasticsearch command line interface",
+	}
 
 	// flags
 	esURL        string

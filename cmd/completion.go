@@ -1,4 +1,3 @@
-// TODO: This isn't working quite right 🤷‍♂️
 package cmd
 
 import (
