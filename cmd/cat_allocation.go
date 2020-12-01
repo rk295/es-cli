@@ -12,10 +12,12 @@ import (
 
 var (
 	allocationCmd = &cobra.Command{
-		Use:   "allocation",
-		Short: "cat cluster allocations",
-		Long:  "cat cluster allocations",
-		Run:   esAllocation,
+		Use:           "allocation",
+		Short:         "cat cluster allocations",
+		Long:          "cat cluster allocations",
+		RunE:          esAllocation,
+		SilenceErrors: true,
+		SilenceUsage:  true,
 	}
 
 	// flags
@@ -28,12 +30,12 @@ func init() {
 	catCmd.AddCommand(allocationCmd)
 }
 
-func esAllocation(cmd *cobra.Command, args []string) {
+func esAllocation(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
 	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	defer client.Stop()
 
@@ -42,7 +44,7 @@ func esAllocation(cmd *cobra.Command, args []string) {
 	// TODO: Add NodeID() to this chain
 	allocList, err := allocService.Bytes(byteFormat).Sort(allocSortField).Do(ctx)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	t := table.NewWriter()
@@ -89,5 +91,5 @@ func esAllocation(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println(t.Render())
-	return
+	return nil
 }

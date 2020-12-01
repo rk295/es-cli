@@ -12,10 +12,12 @@ import (
 
 var (
 	shardsCmd = &cobra.Command{
-		Use:   "shards",
-		Short: "cat shards",
-		Long:  "cat shards",
-		Run:   esShards,
+		Use:           "shards",
+		Short:         "cat shards",
+		Long:          "cat shards",
+		RunE:          esShards,
+		SilenceErrors: true,
+		SilenceUsage:  true,
 	}
 
 	// flags
@@ -34,12 +36,12 @@ func init() {
 	catCmd.AddCommand(shardsCmd)
 }
 
-func esShards(cmd *cobra.Command, args []string) {
+func esShards(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
 	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	defer client.Stop()
 
@@ -47,7 +49,7 @@ func esShards(cmd *cobra.Command, args []string) {
 
 	shardList, err := shardsSVC.Bytes(byteFormat).Sort(sortField).Do(ctx)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	t := table.NewWriter()
@@ -89,6 +91,5 @@ func esShards(cmd *cobra.Command, args []string) {
 		})
 	}
 	fmt.Println(t.Render())
-	return
-
+	return nil
 }

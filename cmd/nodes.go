@@ -12,10 +12,12 @@ import (
 
 var (
 	nodesCmd = &cobra.Command{
-		Use:   "nodes",
-		Short: "es nodes",
-		Long:  "es cluster nodes",
-		Run:   esNodes,
+		Use:           "nodes",
+		Short:         "es nodes",
+		Long:          "es cluster nodes",
+		RunE:          esNodes,
+		SilenceErrors: true,
+		SilenceUsage:  true,
 	}
 )
 
@@ -23,18 +25,21 @@ func init() {
 	rootCmd.AddCommand(nodesCmd)
 }
 
-func esNodes(cmd *cobra.Command, args []string) {
+func esNodes(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
 	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	defer client.Stop()
 
 	nodes := client.NodesInfo()
 
 	status, err := nodes.Do(ctx)
+	if err != nil {
+		return err
+	}
 
 	t := table.NewWriter()
 	t.Render()
@@ -58,7 +63,7 @@ func esNodes(cmd *cobra.Command, args []string) {
 		} else {
 			a, err := prettyjson.Marshal(v.Attributes)
 			if err != nil {
-				fmt.Println(err)
+				return err
 			}
 			attributes = string(a)
 		}
@@ -69,7 +74,7 @@ func esNodes(cmd *cobra.Command, args []string) {
 		} else {
 			s, err := prettyjson.Marshal(v.Settings)
 			if err != nil {
-				fmt.Println(err)
+				return err
 			}
 			settings = string(s)
 		}
@@ -82,6 +87,6 @@ func esNodes(cmd *cobra.Command, args []string) {
 		})
 	}
 	fmt.Println(t.Render())
-	return
+	return nil
 
 }

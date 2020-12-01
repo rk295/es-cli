@@ -11,23 +11,25 @@ import (
 )
 
 var healthCmd = &cobra.Command{
-	Use:   "health",
-	Short: "health",
-	Long:  "health",
-	Run:   catHealth,
+	Use:           "health",
+	Short:         "health",
+	Long:          "health",
+	RunE:          catHealth,
+	SilenceErrors: true,
+	SilenceUsage:  true,
 }
 
 func init() {
 	catCmd.AddCommand(healthCmd)
 }
 
-func catHealth(cmd *cobra.Command, args []string) {
+func catHealth(cmd *cobra.Command, args []string) error {
 
 	ctx := context.Background()
 
 	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	defer client.Stop()
 
@@ -35,7 +37,7 @@ func catHealth(cmd *cobra.Command, args []string) {
 
 	health, err := healthService.Do(ctx)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 
 	var s []byte
@@ -46,4 +48,5 @@ func catHealth(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Println(string(s))
+	return nil
 }
