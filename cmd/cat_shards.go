@@ -23,6 +23,7 @@ var (
 	// flags
 	sortField  string
 	byteFormat string
+	unassigned bool
 )
 
 const (
@@ -33,6 +34,8 @@ const (
 func init() {
 	shardsCmd.Flags().StringVarP(&sortField, sortFlag, "s", defaultSortField, "Field to sort by, possible to list multiple comma separated See https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-shards.html for full list of fields")
 	shardsCmd.Flags().StringVarP(&byteFormat, byteFlag, "b", defaultByteFormat, `Byte unit to use. Valid values are: "b", "k", "kb", "m", "mb", "g", "gb", "t", "tb", "p" or "pb"`)
+	shardsCmd.Flags().BoolVar(&unassigned, "unassigned", false, "Just print the number of unassigned shards")
+
 	catCmd.AddCommand(shardsCmd)
 }
 
@@ -68,6 +71,8 @@ func esShards(cmd *cobra.Command, args []string) error {
 
 	t.SetCaption("%s_cat/shards?format=json&pretty&bytes=%s&s=%s", esURL, byteFormat, sortField)
 
+	var unassignedShards int
+
 	for _, s := range shardList {
 
 		state := s.State
@@ -80,6 +85,10 @@ func esShards(cmd *cobra.Command, args []string) error {
 			}
 		}
 
+		if s.State == "UNASSIGNED" {
+			unassignedShards++
+		}
+
 		t.AppendRow([]interface{}{
 			s.Index,
 			s.Shard,
@@ -90,6 +99,19 @@ func esShards(cmd *cobra.Command, args []string) error {
 			s.Node,
 		})
 	}
+
+	if unassigned && unassignedShards > 0 {
+		printUnassignedWarning(unassignedShards)
+		return nil // Return here because if unassigned is true we do nothing else
+	}
+
 	fmt.Println(t.Render())
+	if unassignedShards > 0 {
+		printUnassignedWarning(unassignedShards)
+	}
 	return nil
+}
+
+func printUnassignedWarning(count int) {
+	fmt.Printf("Caution, there are %v unassigned shards\n", count)
 }

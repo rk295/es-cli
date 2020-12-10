@@ -1,5 +1,7 @@
 package cmd
 
+// TODO: Allow specifying a single node
+
 import (
 	"context"
 	"fmt"
