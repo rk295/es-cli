@@ -23,6 +23,8 @@ var (
 		SilenceUsage:  true,
 		Args:          cobra.MinimumNArgs(0),
 	}
+
+	detailedFlag bool
 )
 
 const (
@@ -31,6 +33,7 @@ const (
 )
 
 func init() {
+	tasksCmd.Flags().BoolVarP(&detailedFlag, "detailed", "d", false, "Include detailed output")
 	catCmd.AddCommand(tasksCmd)
 }
 
@@ -47,7 +50,7 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 
 	tasksSVC := elastic.NewTasksListService(client)
 
-	taskList, err := tasksSVC.Do(ctx)
+	taskList, err := tasksSVC.Detailed(detailedFlag).Do(ctx)
 	if err != nil {
 		return err
 	}
@@ -55,8 +58,7 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 	t := table.NewWriter()
 	t.Render()
 	t.SetStyle(tableStyle)
-
-	t.AppendHeader(table.Row{
+	h := table.Row{
 		"Name",
 		"Task ID",
 		"Action",
@@ -64,7 +66,13 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 		"Start Time",
 		"Running Time",
 		"Sort - hidden in output",
-	})
+	}
+
+	if detailedFlag {
+		h = append(h, "Description")
+	}
+
+	t.AppendHeader(h)
 
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{Number: 7, Hidden: true},
@@ -97,17 +105,21 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 				prettyDuration = color.GreenString(fmt.Sprintf("%v", duration))
 			}
 
-			tableRows = append(tableRows,
-				table.Row{
-					node.Name,
-					fmt.Sprintf("%v:%v", task.Node, task.Id),
-					task.Action,
-					task.Type,
-					time.Unix(0, task.StartTimeInMillis*int64(time.Millisecond)),
-					prettyDuration,
-					duration,
-				},
-			)
+			row := table.Row{
+				node.Name,
+				fmt.Sprintf("%v:%v", task.Node, task.Id),
+				task.Action,
+				task.Type,
+				time.Unix(0, task.StartTimeInMillis*int64(time.Millisecond)),
+				prettyDuration,
+				duration,
+			}
+
+			if detailedFlag {
+				row = append(row, task.Description)
+			}
+
+			tableRows = append(tableRows, row)
 		}
 	}
 
