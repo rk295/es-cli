@@ -14,13 +14,14 @@ import (
 
 var (
 	tasksCmd = &cobra.Command{
-		Use:   "tasks",
+		Use:   "tasks [node-name]",
 		Short: "Lists the running tasks within the cluster",
 		Long: `Lists the running tasks within the cluster. Sorted by running time.
 `,
 		RunE:          esCatTasks,
 		SilenceErrors: true,
 		SilenceUsage:  true,
+		Args:          cobra.MinimumNArgs(0),
 	}
 )
 
@@ -78,6 +79,11 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 	// fmt.Println("Task Failures:", taskList.TaskFailures)
 
 	for _, node := range taskList.Nodes {
+
+		if len(args) == 1 && node.Name != args[0] {
+			continue
+		}
+
 		for _, task := range node.Tasks {
 
 			duration := time.Duration(task.RunningTimeInNanos) * time.Nanosecond
