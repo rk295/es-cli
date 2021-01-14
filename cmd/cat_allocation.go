@@ -90,6 +90,6 @@ func esAllocation(cmd *cobra.Command, args []string) error {
 		})
 	}
 
-	fmt.Println(t.Render())
+	fmt.Println(render(t))
 	return nil
 }

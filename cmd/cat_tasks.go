@@ -128,7 +128,7 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 	})
 
 	t.AppendRows(tableRows)
-	fmt.Println(t.Render())
+	fmt.Println(render(t))
 	return nil
 
 }

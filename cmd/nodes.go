@@ -88,7 +88,7 @@ func esNodes(cmd *cobra.Command, args []string) error {
 			settings,
 		})
 	}
-	fmt.Println(t.Render())
+	fmt.Println(render(t))
 	return nil
 
 }

@@ -8,10 +8,12 @@ var (
 	esURLDefault        = "http://localhost:9200/"
 
 	// Flags
-	byteFlag   = "byte"
-	colourFlag = "colour"
-	esURLFlag  = "es-url"
-	sortFlag   = "sort"
+	byteFlag          = "byte"
+	colourFlag        = "colour"
+	esURLFlag         = "es-url"
+	sortFlag          = "sort"
+	markdownFlag      = "markdown"
+	markdownShortFlag = "m"
 
 	// Output
 	tableStyle = table.StyleRounded

@@ -11,8 +11,9 @@ var (
 	}
 
 	// flags
-	esURL        string
-	enableColour bool
+	esURL          string
+	enableColour   bool
+	markdownOutput bool
 )
 
 // Execute is respomnsible for executing the viper command
@@ -23,4 +24,5 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVar(&esURL, esURLFlag, esURLDefault, "url for elasticsearch")
 	rootCmd.PersistentFlags().BoolVar(&enableColour, colourFlag, enableColourDefault, "Enable/Disable Colour.")
+	rootCmd.PersistentFlags().BoolVarP(&markdownOutput, markdownFlag, markdownShortFlag, false, "Produce Markdown output")
 }

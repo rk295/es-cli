@@ -105,7 +105,7 @@ func esShards(cmd *cobra.Command, args []string) error {
 		return nil // Return here because if unassigned is true we do nothing else
 	}
 
-	fmt.Println(t.Render())
+	fmt.Println(render(t))
 	if unassignedShards > 0 {
 		printUnassignedWarning(unassignedShards)
 	}
