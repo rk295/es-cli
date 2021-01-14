@@ -6,7 +6,6 @@ import (
 	"sort"
 	"time"
 
-	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/spf13/cobra"
@@ -86,6 +85,8 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 	t.AppendHeader(h)
 
 	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 5, Transformer: timeInMSTransformer()},
+		{Number: 6, Transformer: durationTransformer()},
 		{Number: 7, Hidden: true},
 	})
 
@@ -110,23 +111,14 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 		for _, task := range node.Tasks {
 
 			duration := time.Duration(task.RunningTimeInNanos) * time.Nanosecond
-			var prettyDuration string
-
-			if duration > redDuration {
-				prettyDuration = color.RedString(fmt.Sprintf("%v", duration))
-			} else if duration > yellowDuration {
-				prettyDuration = color.YellowString(fmt.Sprintf("%v", duration))
-			} else {
-				prettyDuration = color.GreenString(fmt.Sprintf("%v", duration))
-			}
 
 			row := table.Row{
 				node.Name,
 				fmt.Sprintf("%v:%v", task.Node, task.Id),
 				task.Action,
 				task.Type,
-				time.Unix(0, task.StartTimeInMillis*int64(time.Millisecond)),
-				prettyDuration,
+				task.StartTimeInMillis,
+				task.RunningTimeInNanos,
 				duration,
 			}
 
