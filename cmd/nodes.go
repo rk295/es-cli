@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hokaccha/go-prettyjson"
 	"github.com/jedib0t/go-pretty/v6/table"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/spf13/cobra"
@@ -46,38 +45,20 @@ func esNodes(cmd *cobra.Command, args []string) error {
 		"Node",
 	})
 
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 3, Transformer: prettyJSONTransformer()},
+		{Number: 4, Transformer: prettyJSONTransformer()},
+	})
+
 	t.SetCaption("%s_nodes", esURL)
 
 	for _, v := range status.Nodes {
 
-		var attributes string
-
-		if v.Attributes == nil {
-			attributes = ""
-		} else {
-			a, err := prettyjson.Marshal(v.Attributes)
-			if err != nil {
-				return err
-			}
-			attributes = string(a)
-		}
-
-		var settings string
-		if v.Settings == nil {
-			settings = ""
-		} else {
-			s, err := prettyjson.Marshal(v.Settings)
-			if err != nil {
-				return err
-			}
-			settings = string(s)
-		}
-
 		t.AppendRow([]interface{}{
 			v.Name,
 			v.Version,
-			attributes,
-			settings,
+			v.Attributes,
+			v.Settings,
 		})
 	}
 	fmt.Println(render(t))

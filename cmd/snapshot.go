@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hokaccha/go-prettyjson"
 	"github.com/jedib0t/go-pretty/v6/table"
 	elastic "github.com/olivere/elastic/v7"
 	"github.com/spf13/cobra"
@@ -50,18 +49,16 @@ func esSnapshot(cmd *cobra.Command, args []string) error {
 		"Configuration",
 	})
 
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Number: 2, Transformer: prettyJSONTransformer()},
+	})
+
 	t.SetCaption("%s_snapshot", esURL)
 
 	for n, v := range status {
-		s, err := prettyjson.Marshal(v)
-		if err != nil {
-			return err
-		}
-		settings := string(s)
-
 		t.AppendRow([]interface{}{
 			n,
-			settings,
+			v,
 		})
 	}
 	fmt.Println(render(t))
