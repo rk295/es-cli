@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -55,5 +56,16 @@ func durationTransformer() text.Transformer {
 		}
 
 		return prettyDuration
+	}
+}
+
+func taskDetailTransformer() text.Transformer {
+	return func(val interface{}) string {
+		s := val.(string)
+		// Don't wrap if we only have one (the most common case)
+		if strings.Count(s, ",") <= 1 {
+			return s
+		}
+		return strings.Replace(s, ",", ",\n ", -1)
 	}
 }
