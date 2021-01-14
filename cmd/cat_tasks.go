@@ -22,6 +22,17 @@ var (
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Args:          cobra.MinimumNArgs(0),
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			if len(args) != 0 {
+				return nil, cobra.ShellCompDirectiveNoFileComp
+			}
+			var nodes []string
+			nodes, err := getESNodeNames(context.Background())
+			if err != nil {
+				return nodes, cobra.ShellCompDirectiveNoFileComp
+			}
+			return nodes, cobra.ShellCompDirectiveNoFileComp
+		},
 	}
 
 	detailedFlag bool

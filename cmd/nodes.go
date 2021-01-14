@@ -30,15 +30,7 @@ func init() {
 func esNodes(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
-	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
-	if err != nil {
-		return err
-	}
-	defer client.Stop()
-
-	nodes := client.NodesInfo()
-
-	status, err := nodes.Do(ctx)
+	status, err := getESNodes(ctx)
 	if err != nil {
 		return err
 	}
@@ -91,4 +83,31 @@ func esNodes(cmd *cobra.Command, args []string) error {
 	fmt.Println(render(t))
 	return nil
 
+}
+
+func getESNodes(ctx context.Context) (*elastic.NodesInfoResponse, error) {
+	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
+	if err != nil {
+		return &elastic.NodesInfoResponse{}, err
+	}
+	defer client.Stop()
+
+	nodes := client.NodesInfo()
+
+	return nodes.Do(ctx)
+}
+
+func getESNodeNames(ctx context.Context) ([]string, error) {
+
+	var nodeNames []string
+
+	nodeInfo, err := getESNodes(ctx)
+	if err != nil {
+		return nodeNames, err
+	}
+
+	for _, n := range nodeInfo.Nodes {
+		nodeNames = append(nodeNames, n.Name)
+	}
+	return nodeNames, err
 }
