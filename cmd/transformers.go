@@ -16,8 +16,7 @@ func prettyJSONTransformer() text.Transformer {
 
 		a, err := prettyjson.Marshal(val)
 		if err != nil {
-			// TODO: Unsure what to do here?
-			return "error: failed to marshal"
+			return val.(string)
 		}
 		attributes = string(a)
 
@@ -29,7 +28,7 @@ func timeInMSTransformer() text.Transformer {
 	return func(val interface{}) string {
 		t, ok := val.(int64)
 		if !ok {
-			return "error: failed to parse the time"
+			return val.(string)
 		}
 
 		return fmt.Sprintf("%s", time.Unix(0, t*int64(time.Millisecond)))
@@ -41,7 +40,7 @@ func durationTransformer() text.Transformer {
 
 		t, ok := val.(int64)
 		if !ok {
-			return "error: failed to parse the time"
+			return val.(string)
 		}
 
 		duration := time.Duration(t) * time.Nanosecond
