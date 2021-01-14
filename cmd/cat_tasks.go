@@ -78,7 +78,11 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 		{Number: 7, Hidden: true},
 	})
 
-	t.SetCaption("%s_cat/tasks?format=json&pretty", esURL)
+	url := fmt.Sprintf("%s_cat/tasks?format=json&pretty", esURL)
+	if detailedFlag {
+		url = fmt.Sprintf("%s&detailed", url)
+	}
+	t.SetCaption(url)
 
 	var tableRows rows
 
