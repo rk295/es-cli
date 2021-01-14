@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -59,4 +60,18 @@ $ yourprogram completion fish > ~/.config/fish/completions/yourprogram.fish
 
 func init() {
 	rootCmd.AddCommand(completionCmd)
+}
+
+func esNodeNounCompletion() func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		var nodes []string
+		nodes, err := getESNodeNames(context.Background())
+		if err != nil {
+			return nodes, cobra.ShellCompDirectiveNoFileComp
+		}
+		return nodes, cobra.ShellCompDirectiveNoFileComp
+	}
 }

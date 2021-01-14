@@ -13,12 +13,14 @@ import (
 
 var (
 	nodesCmd = &cobra.Command{
-		Use:           "nodes",
-		Short:         "es nodes",
-		Long:          "es cluster nodes",
-		RunE:          esNodes,
-		SilenceErrors: true,
-		SilenceUsage:  true,
+		Use:               "nodes [node-name]",
+		Short:             "es nodes",
+		Long:              "es cluster nodes",
+		RunE:              esNodes,
+		SilenceErrors:     true,
+		SilenceUsage:      true,
+		Args:              cobra.MinimumNArgs(0),
+		ValidArgsFunction: esNodeNounCompletion(),
 	}
 )
 
@@ -29,7 +31,11 @@ func init() {
 func esNodes(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
-	status, err := getESNodes(ctx)
+	node := ""
+	if len(args) >= 1 {
+		node = args[0]
+	}
+	status, err := getESNodes(ctx, node)
 	if err != nil {
 		return err
 	}
@@ -50,7 +56,12 @@ func esNodes(cmd *cobra.Command, args []string) error {
 		{Name: "Node", Transformer: prettyJSONTransformer()},
 	})
 
-	t.SetCaption("%s_nodes", esURL)
+	u := fmt.Sprintf("%s_nodes", esURL)
+	if node != "" {
+		u = fmt.Sprintf("%s/%s", u, node)
+	}
+	u = fmt.Sprintf("%s?format=json&pretty", u)
+	t.SetCaption(u)
 
 	for _, v := range status.Nodes {
 
@@ -66,7 +77,7 @@ func esNodes(cmd *cobra.Command, args []string) error {
 
 }
 
-func getESNodes(ctx context.Context) (*elastic.NodesInfoResponse, error) {
+func getESNodes(ctx context.Context, node string) (*elastic.NodesInfoResponse, error) {
 	client, err := elastic.NewSimpleClient(elastic.SetURL(esURL))
 	if err != nil {
 		return &elastic.NodesInfoResponse{}, err
@@ -75,14 +86,14 @@ func getESNodes(ctx context.Context) (*elastic.NodesInfoResponse, error) {
 
 	nodes := client.NodesInfo()
 
-	return nodes.Do(ctx)
+	return nodes.NodeId(node).Do(ctx)
 }
 
 func getESNodeNames(ctx context.Context) ([]string, error) {
 
 	var nodeNames []string
 
-	nodeInfo, err := getESNodes(ctx)
+	nodeInfo, err := getESNodes(ctx, "")
 	if err != nil {
 		return nodeNames, err
 	}
