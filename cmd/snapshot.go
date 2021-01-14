@@ -50,7 +50,7 @@ func esSnapshot(cmd *cobra.Command, args []string) error {
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 2, Transformer: prettyJSONTransformer()},
+		{Name: "Configuration", Transformer: prettyJSONTransformer()},
 	})
 
 	t.SetCaption("%s_snapshot", esURL)

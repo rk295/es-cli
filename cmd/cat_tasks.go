@@ -75,7 +75,7 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 		"Type",
 		"Start Time",
 		"Running Time",
-		"Sort - hidden in output",
+		"Sort",
 	}
 
 	if detailedFlag {
@@ -85,9 +85,10 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 	t.AppendHeader(h)
 
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 5, Transformer: timeInMSTransformer()},
-		{Number: 6, Transformer: durationTransformer()},
-		{Number: 7, Hidden: true},
+		{Name: "Start Time", Transformer: timeInMSTransformer()},
+		{Name: "Running Time", Transformer: durationTransformer()},
+		{Name: "Sort", Hidden: true},
+		{Name: "Description", Transformer: taskDetailTransformer()},
 	})
 
 	url := fmt.Sprintf("%s_cat/tasks?format=json&pretty", esURL)

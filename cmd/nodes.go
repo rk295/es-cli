@@ -46,8 +46,8 @@ func esNodes(cmd *cobra.Command, args []string) error {
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Number: 3, Transformer: prettyJSONTransformer()},
-		{Number: 4, Transformer: prettyJSONTransformer()},
+		{Name: "Attributes", Transformer: prettyJSONTransformer()},
+		{Name: "Node", Transformer: prettyJSONTransformer()},
 	})
 
 	t.SetCaption("%s_nodes", esURL)
