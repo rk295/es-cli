@@ -30,6 +30,8 @@ var (
 const (
 	redDuration    time.Duration = 30 * time.Second
 	yellowDuration time.Duration = 10 * time.Second
+
+	urlPath = "_cat/tasks"
 )
 
 func init() {
@@ -81,11 +83,11 @@ func esCatTasks(cmd *cobra.Command, args []string) error {
 		{Name: "Description", Transformer: taskDetailTransformer()},
 	})
 
-	url := fmt.Sprintf("%s_cat/tasks?format=json&pretty", esURL)
+	var q queryParams
 	if detailedFlag {
-		url = fmt.Sprintf("%s&detailed", url)
+		q["detailed"] = ""
 	}
-	t.SetCaption(url)
+	t.SetCaption(buildURL(urlPath, q))
 
 	var tableRows rows
 
