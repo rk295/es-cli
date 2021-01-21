@@ -12,8 +12,10 @@ import (
 )
 
 var (
+	stateOptions = []string{"initializing", "relocating", "started", "unassigned"}
+
 	shardsCmd = &cobra.Command{
-		Use:           "shards",
+		Use:           fmt.Sprintf("shards [--state=%s] [--unassigned]", strings.Join(stateOptions, "|")),
 		Short:         "Lists the shards in the cluster.",
 		Long:          "Lists the shards in the cluster. Supports sorting and changing the byte unit to use.",
 		RunE:          esShards,
@@ -35,9 +37,10 @@ const (
 )
 
 func init() {
+
 	shardsCmd.Flags().StringVarP(&sortField, sortFlag, "s", defaultSortField, "Field to sort by, possible to list multiple comma separated See https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-shards.html for full list of fields")
 	shardsCmd.Flags().StringVarP(&byteFormat, byteFlag, "b", defaultByteFormat, `Byte unit to use. Valid values are: "b", "k", "kb", "m", "mb", "g", "gb", "t", "tb", "p" or "pb"`)
-	shardsCmd.Flags().StringVar(&stateFilter, stateFilterFlag, "", `Filter shards by state, possible values are: "initializing", "relocating", "started", "unassigned"`)
+	shardsCmd.Flags().StringVar(&stateFilter, stateFilterFlag, "", fmt.Sprintf("Filter shards by state, possible values are: %s", strings.Join(stateOptions, ",")))
 	shardsCmd.Flags().BoolVar(&unassigned, "unassigned", false, "Just print the number of unassigned shards")
 
 	catCmd.AddCommand(shardsCmd)
