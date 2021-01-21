@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
@@ -21,19 +22,22 @@ var (
 	}
 
 	// flags
-	sortField  string
-	byteFormat string
-	unassigned bool
+	sortField   string
+	byteFormat  string
+	unassigned  bool
+	stateFilter string
 )
 
 const (
 	defaultByteFormat = "mb"
 	defaultSortField  = "index"
+	stateFilterFlag   = "state"
 )
 
 func init() {
 	shardsCmd.Flags().StringVarP(&sortField, sortFlag, "s", defaultSortField, "Field to sort by, possible to list multiple comma separated See https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-shards.html for full list of fields")
 	shardsCmd.Flags().StringVarP(&byteFormat, byteFlag, "b", defaultByteFormat, `Byte unit to use. Valid values are: "b", "k", "kb", "m", "mb", "g", "gb", "t", "tb", "p" or "pb"`)
+	shardsCmd.Flags().StringVar(&stateFilter, stateFilterFlag, "", `Filter shards by state, possible values are: "initializing", "relocating", "started", "unassigned"`)
 	shardsCmd.Flags().BoolVar(&unassigned, "unassigned", false, "Just print the number of unassigned shards")
 
 	catCmd.AddCommand(shardsCmd)
@@ -89,6 +93,10 @@ func esShards(cmd *cobra.Command, args []string) error {
 			unassignedShards++
 		}
 
+		if stateFilter != "" && strings.ToUpper(stateFilter) != s.State {
+			continue
+		}
+
 		t.AppendRow([]interface{}{
 			s.Index,
 			s.Shard,
@@ -100,8 +108,12 @@ func esShards(cmd *cobra.Command, args []string) error {
 		})
 	}
 
-	if unassigned && unassignedShards > 0 {
-		printUnassignedWarning(unassignedShards)
+	if unassigned {
+		if unassignedShards > 0 {
+			printUnassignedWarning(unassignedShards)
+		} else {
+			fmt.Println("There are no unassigned shares")
+		}
 		return nil // Return here because if unassigned is true we do nothing else
 	}
 
