@@ -26,3 +26,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&enableColour, colourFlag, enableColourDefault, "Enable/Disable Colour.")
 	rootCmd.PersistentFlags().BoolVarP(&markdownOutput, markdownFlag, markdownShortFlag, false, "Produce Markdown output")
 }
+
+func NewESCliCommand() *cobra.Command {
+	return rootCmd
+}

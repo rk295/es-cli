@@ -9,3 +9,7 @@ install: es-cli
 
 completion: install
 	es-cli completion bash > ${HOME}/.profile.d/es-cli.sh
+
+.PHONY: doc
+docs:
+	cd docs && go run docs.go
