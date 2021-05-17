@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	foo := cmd.NewESCliCommand()
-	err := doc.GenMarkdownTree(foo, "./")
+	rootCMD := cmd.NewESCliCommand()
+	err := doc.GenMarkdownTree(rootCMD, "./")
 	if err != nil {
 		log.Fatal(err)
 	}
